@@ -85,8 +85,8 @@ class CreditsState extends MusicBeatState
 			['idklool', 'nothing', 'Hi I ported this again', 'https://youtube.com/@idklool121', 'FFFFFF'],
 			[''],
 			['Cara q fez o port lol'],
-            ['Guislakkkk',    'gui',                'a',                    'https://youtube.com/channel/UCVniqkS8csFDi8U2N6UrVhQ',     'FE0015'],
-            [''],
+            ['Guislakkkk', 'gui', 'a', 'https://youtube.com/channel/UCVniqkS8csFDi8U2N6UrVhQ',  'FE0015'],
+            ['']
 			['Psych Engine Team'],
 			['Shadow Mario',		'shadowmario',		'Main Programmer of Psych Engine',								'https://twitter.com/Shadow_Mario_',	'444444'],
 			['RiverOaken',			'river',			'Main Artist/Animator of Psych Engine',							'https://twitter.com/RiverOaken',		'B42F71'],

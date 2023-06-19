@@ -1,49 +1,62 @@
--- Script by a dumbass you just watched from (HenrySMD)
+local downscrollIsLame = 0
 
-local healthBarIsFlip = true
-local stickThere = false
-function onUpdate(elapsed)
-	if healthBarIsFlip == true then -- if you want to flip the health bar or not (set to true to flip, set false will turn back to normal)
-		setProperty('healthBar.flipX', true)
+function onCreatePost()
 
-		if getProperty('health') < 2 then
-			stickThere = false
-		end
-
-		if getProperty('health') >= 2 then
-			stickThere = true
-		end
-	else
-		setProperty('healthBar.flipX', false)
+	local texture = '' .. 'minecraftNOTE_assets'
+	if downscroll then
+		downscrollIsLame = 720 else downscrollIsLame = 0
 	end
+
+	for i = 0, 3 do setPropertyFromGroup('playerStrums', i, 'texture', texture) end
+	
+    for i = 0, getProperty('unspawnNotes.length') - 1 do
+        if getPropertyFromGroup('unspawnNotes', i, 'mustPress') then
+            setPropertyFromGroup('unspawnNotes', i, 'texture', texture)
+			setPropertyFromGroup('unspawnNotes', i, 'scale.x', 8)
+			setPropertyFromGroup('unspawnNotes', i, 'scale.y', 8)
+			setPropertyFromGroup('unspawnNotes', i, 'antialiasing', false)
+			setPropertyFromGroup('unspawnNotes', i, 'noteSplashDisabled', true)
+			if isSustainNote and animation.curAnim.name:endswith('hold') then
+				setPropertyFromGroup('unspawnNotes', i, 'scale.y', 24)
+			end
+        end
+    end
+	
+	for i = 0, 3 do
+		setPropertyFromGroup('playerStrums', i, 'scale.x', 8)
+		setPropertyFromGroup('playerStrums', i, 'scale.y', 8)
+		setPropertyFromGroup('playerStrums', i, 'antialiasing', false)
+	end
+	
+	makeLuaSprite('mcNoteUnderlay', 'minecraftNOTE_assetsBACK', 306, 40 + downscrollIsLame)
+	scaleObject('mcNoteUnderlay', 8, 8)
+	setProperty('mcNoteUnderlay.antialiasing', false)
+	setObjectCamera('mcNoteUnderlay', 'camHUD')
+	setObjectOrder('mcNoteUnderlay', 0)
+	addLuaSprite('mcNoteUnderlay', true)
+	
+	for i = 0, 3 do
+		noteTweenY('play'..i..'y', i+4, 123 + downscrollIsLame, 0.0001, 'linear')
+	end
+	noteTweenX('oppo0', 0, -1000, 0.001, 'quartInOut')
+	noteTweenX('oppo1', 1, -1000, 0.001, 'quartInOut')
+	noteTweenX('oppo2', 2, -1000, 0.001, 'quartInOut')
+	noteTweenX('oppo3', 3, -1000, 0.001, 'quartInOut')
+	noteTweenX('play0x', 4, 390, 2, 'quartInOut')
+	noteTweenX('play1x', 5, 550, 2, 'quartInOut')
+	noteTweenX('play2x', 6, 710, 2, 'quartInOut')
+	noteTweenX('play3x', 7, 870, 2, 'quartInOut')
+	noteTweenAngle('playrotate0', 4, 360, 2, 'quartInOut')
+	noteTweenAngle('playrotate1', 5, 360, 2, 'quartInOut')
+	noteTweenAngle('playrotate2', 6, 360, 2, 'quartInOut')
+	noteTweenAngle('playrotate3', 7, 360, 2, 'quartInOut')
+	
 end
 
-function onUpdatePost()
-	if healthBarIsFlip == true then
-		setProperty('iconP1.flipX', true)
-		setProperty('iconP2.flipX', true)
-
-		if stickThere == false then
-			if getProperty('health') > 0 then
-				setProperty('iconP1.x', 216+getProperty('health')*296+getProperty('healthBar.x')-343.5)
-				setProperty('iconP2.x', 317+getProperty('health')*297+getProperty('healthBar.x')-343.5)
-			end
-
-			if getProperty('health') <= 0 then
-				setProperty('iconP1.x', 216+getProperty('healthBar.x')-343.5)
-				setProperty('iconP2.x', 317+getProperty('healthBar.x')-343.5)
-			end
-		end
-
-		if stickThere == true then
-		   setProperty('iconP1.x', 808+getProperty('healthBar.x')-343.5)
-		   setProperty('iconP2.x', 911+getProperty('healthBar.x')-343.5)
-		end
-
-		--setProperty('iconP1.y', getProperty('healthBar.y') -75) -- icons stick to health bar (y position), I added if you guys want
-		--setProperty('iconP2.y', getProperty('healthBar.y') -75)
-	else
-		setProperty('iconP1.flipX', false)
-		setProperty('iconP2.flipX', false)
-	end
+function onUpdate()
+    for i = 0, getProperty('notes.length') do
+        if getPropertyFromGroup('notes', i, 'isSustainNote') then
+            setPropertyFromGroup('notes', i, 'offset.x', 39)
+        end
+    end
 end

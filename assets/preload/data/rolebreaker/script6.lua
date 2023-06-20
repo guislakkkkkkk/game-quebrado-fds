@@ -1,26 +1,26 @@
 local beatLength=0
 local stepLength=0
 
-local charName='blackcrew'
-local charDirectory='characters/blackcrew'
+local charName='redcrew'
+local charDirectory='characters/redcrew'
 local charScale=1
 local offsetScalesWithSize=false
-local correspondingNoteType='ExtraCharNote5'
+local correspondingNoteType='ExtraCharNote1'
 local singLength=4
 
-local charPos={-75, 600}
+local charPos={-2225, 600}
 local prefixes={
-		[1]='black right', --[[left]]
-		[2]='black down', --[[down]]
-		[3]='black up', --[[up]]
-		[4]='black left', --[[right]]
-		[5]='black idle', --[[idle]]
+		[1]='red left', --[[left]]
+		[2]='red down', --[[down]]
+		[3]='red up', --[[up]]
+		[4]='red right', --[[right]]
+		[5]='red idle', --[[idle]]
 	}
 local charOffsets={
-		[1]={258, 31}, --[[left]]
-		[2]={260, -2}, --[[down]]
+		[1]={202, 6}, --[[left]]
+		[2]={2, -2}, --[[down]]
 		[3]={42, 407}, --[[up]]
-		[4]={58, 5}, --[[right]]
+		[4]={2, 31}, --[[right]]
 		[5]={0, 0}, --[[idle]]
 	}
 
@@ -54,7 +54,6 @@ function onCreatePost()
 
 	advAnim(charName, 'idle' , true, charOffsets[5])
 	setObjectOrder(charName, 11)
-	setProperty(charName..'.flipX', true)
 	setProperty(charName..'.visible', false)
 end
 

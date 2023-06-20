@@ -1,101 +1,57 @@
-noteFlag = 0
-dxNote = 0
-dxReset = 0
+local creditShown = false
 
-function onCountdownStarted()
-	runHaxeCode([[
-		for (strum in game.opponentStrums)
-		{
-			strum.cameras = [game.camGame];
-			strum.scrollFactor.set(1, 1);
-		}
-		for (note in game.unspawnNotes) 
-		{
-			if (!note.mustPress) {
-				note.cameras = [game.camGame];
-				note.scrollFactor.set(1, 1);
-			} 
-		};
-	]])
-	if downscroll then
-		loserScrollHateHateHATEDownscroll = 180
-	else
-		loserScrollHateHateHATEDownscroll = 0
-	end
-	noteScaleOfficialRealLife = getPropertyFromGroup('unspawnNotes', 0, 'scale.x')
-	sideScroll()
-end
+function onStartCountdown()
+	if not creditShown then
+		setPropertyFromClass('PauseSubState', 'songName', 'gamepauser')
+		
+		makeAnimatedLuaSprite('creditSchmoovin','songCredits/creditThingAnimation', -1400, -300)
+		scaleObject('creditSchmoovin', 1.1, 1.1)
+		addLuaSprite('creditSchmoovin',true);
+		setScrollFactor('creditSchmoovin',0,0);
+		setObjectCamera('creditSchmoovin','hud');
+		addAnimationByPrefix('creditSchmoovin','schmoove','thing')
+		setProperty('creditSchmoovin.angle', -30)
 
-function onStepHit()
-	if curStep > -1 and noteFlag < 1 then
-		noteFlag = 1
-		sideScroll()
-	end
-    if curStep > 1379 and noteFlag < 2 then
-		noteFlag = 2
-		waterScroll()
-    end
-	if curStep > 1603 and noteFlag < 3 then
-		noteFlag = 3
-		rescaleNotes()
-		sideScroll()
+		makeLuaSprite('creditSlide','songCredits/slide'..songName, 0, 1225)
+		scaleObject('creditSlide', 1.1, 1.1)
+		addLuaSprite('creditSlide',true);
+		setScrollFactor('creditSlide',0,0);
+		setObjectCamera('creditSlide','hud');
+
+		makeLuaSprite('creditSpikes','songCredits/spikeys', 1900, 0)
+		scaleObject('creditSpikes', 1.4, 1.4)
+		addLuaSprite('creditSpikes',true);
+		setScrollFactor('creditSpikes',0,0);
+		setObjectCamera('creditSpikes','hud');
+
+		makeLuaSprite('creditCircle','songCredits/circle'..songName, 1650, 350)
+		scaleObject('creditCircle', 1.1, 1.1)
+		addLuaSprite('creditCircle',true);
+		setScrollFactor('creditCircle',0,0);
+		setObjectCamera('creditCircle','hud');
+
+		doTweenX("credSchmooveTween", "creditSchmoovin", -400, 1.0, "sineOut")
+		doTweenY("credSlideTween", "creditSlide", 725, 1.0, "sineOut")
+		doTweenX("credSpikeTween", "creditSpikes", 900, 1.5, "sineOut")
+		doTweenX("credCircTween", "creditCircle", 650, 1.0, "sineOut")
+		
+		creditShown = true
 	end
 end
 
-function sideScroll()
-	for i = 0, 3 do
-		noteTweenDirection('sidescroll'..i, i, 0 + loserScrollHateHateHATEDownscroll, 0.001)
-		setObjectOrder('strumLineNotes', getObjectOrder('trees')+1)
-		setObjectOrder('notes', getObjectOrder('trees')+1)
-		noteTweenY('sidescrollup'..i, i, (screenHeight + -930 - (i*30)) - (110 * ((i - 2) - 1)), 0.001)
-		noteTweenX('sidescrollright'..i, i, screenWidth - 2250, 0.001)
-	end
+function onSongStart()
+	doTweenX("credSchmooveTween", "creditSchmoovin", -1400, 1, "sineIn")
+	doTweenY("credSlideTween", "creditSlide", -400, 0.75, "sineIn")
+	doTweenX("credSpikeTween", "creditSpikes", 1900, 1.5, "sineIn")
+	doTweenX("credCircTween", "creditCircle", 1650, 1, "sineIn")
+	runTimer('credTween', 2)
 end
 
-function waterScroll()
-	for i=0, getProperty('unspawnNotes.length') do
-		if getPropertyFromGroup('unspawnNotes', i, 'mustPress') then else
-			setPropertyFromGroup("unspawnNotes", i, "scale.x", 2)
-			setPropertyFromGroup("unspawnNotes", i, "scale.y", 2)
-		end
-	end
-	for i = 0, 3 do
-		noteTweenDirection('sidescroll'..i, i, 270 + loserScrollHateHateHATEDownscroll, 0.001)
-		setObjectOrder('notes', getObjectOrder('water')+1)
-		noteTweenX('sidescrollup'..i, i, (screenWidth + -1050 - (i*450)) - (110 * ((i - 2) - 1)), 0.001)
-		noteTweenY('sidescrollright'..i, i, screenHeight + 10500, 0.001)
-	end
-end
-
-function rescaleNotes()
-	for i=0, getProperty('unspawnNotes.length') do
-		if getPropertyFromGroup('unspawnNotes', i, 'mustPress') then else
-			setPropertyFromGroup("unspawnNotes", i, "scale.x", noteScaleOfficialRealLife)
-			setPropertyFromGroup("unspawnNotes", i, "scale.y", noteScaleOfficialRealLife)
-		end
-	end
-end
-
-function opponentNoteHit(index, dir, noteType, isSustain)
-	if curStep > 1592 and curStep < 2120 then
-		if not isSustain then
-			makeLuaSprite('dxNote'..dxNote, 'note'..dir, -800 + getRandomInt(-1440, 1440), -400 + getRandomInt(-1080, 720))
-			addLuaSprite('dxNote'..dxNote, false);
-			setObjectOrder('dxNote'..dxNote, getObjectOrder('sun')+1)
-			setProperty('dxNote'..dxNote..'.angle', getRandomInt(-360, 360))
-			scaleObject('dxNote'..dxNote, 3 + (getRandomInt(0, 100)/50), 3 + (getRandomInt(0, 100)/50))
-			doTweenAngle('noteAss'..dxNote, 'dxNote'..dxNote, getRandomInt(-360, 360), 1, 'circOut')
-			doTweenX('noteGrass'..dxNote, 'dxNote'..dxNote..'.scale', 1 + (getRandomInt(0, 50)/100), 1, 'circOut')
-			doTweenY('noteBrass'..dxNote, 'dxNote'..dxNote..'.scale', 1 + (getRandomInt(0, 50)/100), 1, 'circOut')
-			doTweenAlpha('notePass'..dxNote, 'dxNote'..dxNote, 0, 1)
-			dxNote = dxNote + 1
-		end
-	end
-end
-
-function onTweenCompleted(t)
-	if t == 'notePass'..dxReset then
-		removeLuaSprite('dxNote'..dxReset)
-		dxReset = dxReset + 1
+function onTimerCompleted(t)
+	if t == 'credTween' then
+		removeLuaSprite('creditSchmoovin')
+		removeLuaSprite('creditSlide')
+		removeLuaSprite('creditSpikes')
+		removeLuaSprite('creditCircle')
 	end
 end

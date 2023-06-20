@@ -1,84 +1,57 @@
-local beatLength=0
-local stepLength=0
+local creditShown = false
 
-local charName='redcrew'
-local charDirectory='characters/redcrew'
-local charScale=1
-local offsetScalesWithSize=false
-local correspondingNoteType='ExtraCharNote1'
-local singLength=4
+function onStartCountdown()
+	if not creditShown then
+		setPropertyFromClass('PauseSubState', 'songName', 'rolepauser')
+		
+		makeAnimatedLuaSprite('creditSchmoovin','songCredits/creditThingAnimation', -1400, -300)
+		scaleObject('creditSchmoovin', 1.1, 1.1)
+		addLuaSprite('creditSchmoovin',true);
+		setScrollFactor('creditSchmoovin',0,0);
+		setObjectCamera('creditSchmoovin','hud');
+		addAnimationByPrefix('creditSchmoovin','schmoove','thing')
+		setProperty('creditSchmoovin.angle', -30)
 
-local charPos={-2225, 600}
-local prefixes={
-		[1]='red left', --[[left]]
-		[2]='red down', --[[down]]
-		[3]='red up', --[[up]]
-		[4]='red right', --[[right]]
-		[5]='red idle', --[[idle]]
-	}
-local charOffsets={
-		[1]={202, 6}, --[[left]]
-		[2]={2, -2}, --[[down]]
-		[3]={42, 407}, --[[up]]
-		[4]={2, 31}, --[[right]]
-		[5]={0, 0}, --[[idle]]
-	}
+		makeLuaSprite('creditSlide','songCredits/slide'..songName, 0, 1225)
+		scaleObject('creditSlide', 1.1, 1.1)
+		addLuaSprite('creditSlide',true);
+		setScrollFactor('creditSlide',0,0);
+		setObjectCamera('creditSlide','hud');
 
-function mathStuffs()
-	beatLength=(1/bpm)*60
-	stepLength=beatLength*0.25
-end
+		makeLuaSprite('creditSpikes','songCredits/spikeys', 1900, 0)
+		scaleObject('creditSpikes', 1.4, 1.4)
+		addLuaSprite('creditSpikes',true);
+		setScrollFactor('creditSpikes',0,0);
+		setObjectCamera('creditSpikes','hud');
 
-function advAnim(obj,anim,forced,offsetTable)
-	objectPlayAnimation(obj, anim, forced)
-	if offsetScalesWithSize then
-		setProperty(obj..'.offset.x', offsetTable[1]*charScale)
-		setProperty(obj..'.offset.y', offsetTable[2]*charScale)
-	else
-		setProperty(obj..'.offset.x', offsetTable[1])
-		setProperty(obj..'.offset.y', offsetTable[2])		
+		makeLuaSprite('creditCircle','songCredits/circle'..songName, 1750, 350)
+		scaleObject('creditCircle', 1.1, 1.1)
+		addLuaSprite('creditCircle',true);
+		setScrollFactor('creditCircle',0,0);
+		setObjectCamera('creditCircle','hud');
+
+		doTweenX("credSchmooveTween", "creditSchmoovin", -400, 1.0, "sineOut")
+		doTweenY("credSlideTween", "creditSlide", 725, 1.0, "sineOut")
+		doTweenX("credSpikeTween", "creditSpikes", 900, 1.5, "sineOut")
+		doTweenX("credCircTween", "creditCircle", 750, 1.0, "sineOut")
+		
+		creditShown = true
 	end
 end
 
-local singAnims={'singLEFT','singDOWN','singUP','singRIGHT'}
-
-function onCreatePost()
-	mathStuffs()
-	makeAnimatedLuaSprite(charName, charDirectory, charPos[1], charPos[2])
-
-		addAnimationByPrefix(charName, 'singLEFT', prefixes[1], 24, false)
-		addAnimationByPrefix(charName, 'singDOWN', prefixes[2], 24, false)
-		addAnimationByPrefix(charName, 'singUP', prefixes[3], 24, false)
-		addAnimationByPrefix(charName, 'singRIGHT', prefixes[4], 24, false)
-		addAnimationByPrefix(charName, 'idle', prefixes[5], 24, false)
-
-	advAnim(charName, 'idle' , true, charOffsets[5])
-	setObjectOrder(charName, 11)
-	setProperty(charName..'.visible', false)
+function onSongStart()
+	doTweenX("credSchmooveTween", "creditSchmoovin", -1400, 1, "sineIn")
+	doTweenY("credSlideTween", "creditSlide", -400, 0.75, "sineIn")
+	doTweenX("credSpikeTween", "creditSpikes", 1900, 1.5, "sineIn")
+	doTweenX("credCircTween", "creditCircle", 1750, 1, "sineIn")
+	runTimer('credTween', 2)
 end
 
-function goodNoteHit(id,dir,note,sus)
-	if note==correspondingNoteType then
-		advAnim(charName, singAnims[dir+1], true, charOffsets[dir+1])
-		runTimer(charName..'-holdTimer', stepLength*singLength, 1)
-	end
-end
-
-function opponentNoteHit(id,dir,note,sus)
-	if note==correspondingNoteType then
-		advAnim(charName, singAnims[dir+1], true, charOffsets[dir+1])
-		runTimer(charName..'-holdTimer', stepLength*singLength, 1)
-	end
-end
-
-function onTimerCompleted(tag,loops,loopsLeft)
-	if tag==charName..'-holdTimer' then
-		advAnim(charName, 'idle' , true, charOffsets[5])
-	end
-end
-
-function onBeatHit()
-	if curBeat%2==0 and getProperty(charName..'.animation.curAnim.name')=='idle' then
-		advAnim(charName, 'idle' , true, charOffsets[5])
+function onTimerCompleted(t)
+	if t == 'credTween' then
+		removeLuaSprite('creditSchmoovin')
+		removeLuaSprite('creditSlide')
+		removeLuaSprite('creditSpikes')
+		removeLuaSprite('creditCircle')
 	end
 end
